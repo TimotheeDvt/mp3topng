@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>mp3topng</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<!-- input box for mp3 file -->
+	<div id="drop-area">
+		<p>Drag & drop file here or <span id="browse">browse</span></p>
+		<input type="file" id="file-input" hidden accept="audio/*">
+	</div>
+	<div id="preview"></div>
+		<!--  canvas on the right and form on the left -->
+		<div id="container">
+			<canvas id="canvas" width="600" height="600"></canvas>
+			<form id="configForm">
+				<label>
+					Background Color:
+					<input type="color" id="backgroundColor" name="backgroundColor" value="#ffffff">
+				</label><br>
+
+				<label>
+					Image Size (px):
+					<input type="range" id="imgSize" name="imgSize" value="600" min="100" max="5000" step="100">
+					<span id="imgSizeValue">600</span><br>
+				</label><br>
+
+				<label>
+					Number of Dots:
+					<input type="range" id="numDots" name="numDots" value="5000" min="0" max="10000">
+					<span id="numDotsValue">5000</span><br>
+				</label><br>
+
+				<label>
+					Spiral Turns:
+					<input type="range" id="spiralTurns" name="spiralTurns" value="100" min="0" max="100">
+					<span id="spiralTurnsValue">100</span><br>
+				</label>
+
+				<label>
+					Min Dot Size:
+					<input type="range" id="minDotSize" name="minDotSize" value="0" min="0" max="100">
+					<span id="minDotSizeValue">0</span><br>
+				</label>
+
+				<label>
+					Max Dot Size:
+					<input type="range" id="maxDotSize" name="maxDotSize" value="16" min="0" max="100">
+					<span id="maxDotSizeValue">16</span><br>
+				</label>
+
+				<label>
+					Clockwise:
+					<select id="clockwise" name="clockwise">
+						<option value="1">Clockwise</option>
+						<option value="-1">Counter-Clockwise</option>
+					</select>
+				</label><br>
+
+				<label>
+					Start Alpha:
+					<input type="number" id="startAlpha" name="startAlpha" value="1" min="0" max="1" step="0.01">
+				</label><br>
+
+				<label>
+					Middle Percent:
+					<input type="number" id="middlePercent" name="middlePercent" value="0.8" min="0" max="1" step="0.01">
+				</label><br>
+
+				<label>
+					Middle Alpha:
+					<input type="number" id="middleAlpha" name="middleAlpha" value="0.5" min="0" max="1" step="0.01">
+				</label><br>
+
+				<label>
+					Edge Alpha:
+					<input type="number" id="edgeAlpha" name="edgeAlpha" value="0" min="0" max="1" step="0.01">
+				</label><br>
+
+				<label>
+					Global Alpha Auto:
+					<input type="checkbox" id="globalAlphaAuto" name="globalAlphaAuto">
+				</label><br>
+
+				<label>
+					Static Size:
+					<input type="checkbox" id="staticSize" name="staticSize">
+				</label><br>
+
+				<button type="submit">Apply Config</button>
+			</form>
+		</div>
+		<div id="buttons">
+			<button id="copy">Copy Config</button>
+			<button id="paste">Import Config</button>
+			<button id="download">Download PNG</button>
+			<button id="changeFile">Change file</button>
+			<input type="file" id="file-input-img" hidden accept="img/*">
+		</div>
+		<script src="./mp3tocanva.js"></script>
+	</body>
+</html>
