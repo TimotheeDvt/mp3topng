@@ -47,15 +47,15 @@ browse.addEventListener('click', e => {
 });
 
 
-let config = {"backgroundColor":"#000000","imgSize":4200,"numDots":10000,"spiralTurns":100,"minDotSize":0,"maxDotSize":50,"clockwise":1,"startAlpha":1,"middlePercent":0.8,"middleAlpha":0.5,"edgeAlpha":0,"globalAlphaAuto":false,"staticSize":false, "pGreen":0.33,"pBlue":0.33};
+let config = {"backgroundColor":"#000000","imgSize":4200,"numDots":10000,"spiralTurns":100,"minDotSize":0,"maxDotSize":50,"clockwise":1,"startAlpha":1,"middlePercent":0.8,"middleAlpha":0.5,"edgeAlpha":0,"globalAlphaAuto":false,"staticSize":false, "pGreen":0.33,"pBlue":0.33, "lumi":0.4};
 
 let normSamples;
 // Handle file input change
 fileInput.addEventListener('change', async () => {
   for (const file of fileInput.files) {
 		if (!file) return;
-		dropArea.style.display = 'none';
-    preview.innerHTML = `<p>Selected: ${file.name}</p>`;
+			dropArea.style.display = 'none';
+    	preview.innerHTML = `<p>Selected: ${file.name}</p>`;
 		preview.style.display = 'flex';
 
 		container.style.display = 'flex';
@@ -117,6 +117,7 @@ function handleSubmit(e) {
     maxDotSize: parseFloat(document.getElementById('maxDotSize').value),
 	pGreen: parseFloat(document.getElementById('pGreen').value),
 	pBlue: parseFloat(document.getElementById('pBlue').value),
+	lumi: parseFloat(document.getElementById('lumi').value),
     clockwise: parseInt(document.getElementById('clockwise').value, 10),
     startAlpha: parseFloat(document.getElementById('startAlpha').value),
     middlePercent: parseFloat(document.getElementById('middlePercent').value),
@@ -134,6 +135,7 @@ function handleSubmit(e) {
 	document.getElementById('numDotsValue').innerHTML = config.numDots;
 	document.getElementById('pGreenValue').innerHTML = config.pGreen;
 	document.getElementById('pBlueValue').innerHTML = config.pBlue;
+	document.getElementById('lumiValue').innerHTML = config.lumi;
 	document.getElementById('spiralTurnsValue').innerHTML = config.spiralTurns;
 	document.getElementById('minDotSizeValue').innerHTML = config.minDotSize;
 	document.getElementById('maxDotSizeValue').innerHTML = config.maxDotSize;
@@ -245,9 +247,10 @@ function drawSpiralDots(ctx, normSamples, imgSize) {
 		const grad = ctx.createRadialGradient(x, y, 0, x, y, size);
 		// grad.addColorStop(0, `hsla(${hue}, 80%, 60%, ${1 - map(i, 0, numDots, 0, 0.8)})`); // Center
 		// grad.addColorStop(1, `hsla(${hue}, 80%, 60%, 0)`);     // Edge
-		grad.addColorStop(0, `hsla(${hue}, 80%, 60%, ${config.startAlpha})`); // Center
-		grad.addColorStop(config.middlePercent, `hsla(${hue}, 80%, 60%, ${config.middleAlpha})`);     // Middle
-		grad.addColorStop(1, `hsla(${hue}, 80%, 60%, ${config.edgeAlpha})`);     // Edge
+		const lumi = (config.lumi ?? 0.4) * 100;
+		grad.addColorStop(0, `hsla(${hue}, 80%, ${lumi}%, ${config.startAlpha})`); // Center
+		grad.addColorStop(config.middlePercent, `hsla(${hue}, 80%, ${lumi}%, ${config.middleAlpha})`);     // Middle
+		grad.addColorStop(1, `hsla(${hue}, 80%, ${lumi}%, ${config.edgeAlpha})`);     // Edge
 
 		ctx.beginPath();
 		ctx.arc(x, y, size, 0, 2 * Math.PI);
@@ -258,13 +261,20 @@ function drawSpiralDots(ctx, normSamples, imgSize) {
 }
 
 function getColor(i, amp) {
+	const totalP = (config.pGreen ?? 0.33) + (config.pBlue ?? 0.33);
+	if (totalP > 1) {
+		pGreen = (config.pGreen ?? 0.33) / totalP;
+		pBlue = (config.pBlue ?? 0.33) / totalP;
+	}
+	const pOther = 1 - totalP < 0 ? 0 : 1 - totalP;
+	document.getElementById('pOtherValue').innerHTML = pOther.toFixed(2);
 	const r = Math.random();
-	if (r < config.pBlue ?? 0.33) {
+	if (r < pBlue) {
 		// Plus d'aléatoire dans le bleu (180-240)
-		const blueBase = map(amp, 0, 1, 180, 240);
+		const blueBase = map(amp, 0, 1, 150, 210);
 		const randomOffset = (Math.random() - 0.5) * 40; // ±20 de variation
 		return Math.max(180, Math.min(240, blueBase + randomOffset));
-	} else if (r < (config.pGreen ?? 0.33) + (config.pBlue ?? 0.33)) {
+	} else if (r < totalP) {
 		// Vert plus foncé (60-120 au lieu de 90-150) avec plus d'aléatoire
 		const greenBase = map(amp, 0, 1, 60, 120);
 		const randomOffset = (Math.random() - 0.5) * 30; // ±15 de variation

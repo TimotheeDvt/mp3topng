@@ -1,3 +1,8 @@
+body {
+  background-color: black;
+  color: white;
+}
+
 #drop-area {
   width: 350px;
   height: 150px;
@@ -37,6 +42,10 @@
 	align-items: center;
 	justify-content: space-evenly;
 	margin-bottom: 10px;
+}
+
+canvas {
+  border: 1px solid #820000;
 }
 
 #buttons {
