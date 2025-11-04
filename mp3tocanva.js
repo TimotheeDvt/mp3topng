@@ -47,7 +47,7 @@ browse.addEventListener('click', e => {
 });
 
 
-let config = {"backgroundColor":"#ffffff","imgSize":600,"numDots":5000,"spiralTurns":100,"minDotSize":0,"maxDotSize":16,"clockwise":1,"startAlpha":1,"middlePercent":0.8,"middleAlpha":0.5,"edgeAlpha":0,"globalAlphaAuto":false,"staticSize":false}
+let config = {"backgroundColor":"#000000","imgSize":4200,"numDots":10000,"spiralTurns":100,"minDotSize":0,"maxDotSize":50,"clockwise":1,"startAlpha":1,"middlePercent":0.8,"middleAlpha":0.5,"edgeAlpha":0,"globalAlphaAuto":false,"staticSize":false, "pGreen":0.33,"pBlue":0.33};
 
 let normSamples;
 // Handle file input change
@@ -115,6 +115,8 @@ function handleSubmit(e) {
     spiralTurns: parseInt(document.getElementById('spiralTurns').value, 10),
     minDotSize: parseFloat(document.getElementById('minDotSize').value),
     maxDotSize: parseFloat(document.getElementById('maxDotSize').value),
+	pGreen: parseFloat(document.getElementById('pGreen').value),
+	pBlue: parseFloat(document.getElementById('pBlue').value),
     clockwise: parseInt(document.getElementById('clockwise').value, 10),
     startAlpha: parseFloat(document.getElementById('startAlpha').value),
     middlePercent: parseFloat(document.getElementById('middlePercent').value),
@@ -130,6 +132,8 @@ function handleSubmit(e) {
 	document.title = fileInput.files[0].name.split('.')[0];
 	document.getElementById('imgSizeValue').innerHTML = config.imgSize;
 	document.getElementById('numDotsValue').innerHTML = config.numDots;
+	document.getElementById('pGreenValue').innerHTML = config.pGreen;
+	document.getElementById('pBlueValue').innerHTML = config.pBlue;
 	document.getElementById('spiralTurnsValue').innerHTML = config.spiralTurns;
 	document.getElementById('minDotSizeValue').innerHTML = config.minDotSize;
 	document.getElementById('maxDotSizeValue').innerHTML = config.maxDotSize;
@@ -215,6 +219,8 @@ function normalizeAudioData(audioBuffer) {
 }
 
 function drawSpiralDots(ctx, normSamples, imgSize) {
+	ctx.fillStyle = config.backgroundColor;
+	ctx.fillRect(0, 0, imgSize, imgSize);
 	const centerX = imgSize / 2;
 	const centerY = imgSize / 2;
 	const numDots = config.numDots;
@@ -231,7 +237,7 @@ function drawSpiralDots(ctx, normSamples, imgSize) {
 		const x = centerX + Math.cos(angle) * radius;
 		const y = centerY + Math.sin(angle) * radius;
 
-		const hue = (Math.sin(amp * Math.PI * 2) * 180 + 180 + i * 137.5) % 360;
+		const hue = getColor(i, amp);
 		const size = config.staticSize ?
 			config.maxDotSize :
 			map(i, 0, numDots-1, config.minDotSize, config.maxDotSize);
@@ -250,6 +256,23 @@ function drawSpiralDots(ctx, normSamples, imgSize) {
 		ctx.fill();
 	}
 }
+
+function getColor(i, amp) {
+	const r = Math.random();
+	if (r < config.pBlue ?? 0.33) {
+		// Plus d'aléatoire dans le bleu (180-240)
+		const blueBase = map(amp, 0, 1, 180, 240);
+		const randomOffset = (Math.random() - 0.5) * 40; // ±20 de variation
+		return Math.max(180, Math.min(240, blueBase + randomOffset));
+	} else if (r < (config.pGreen ?? 0.33) + (config.pBlue ?? 0.33)) {
+		// Vert plus foncé (60-120 au lieu de 90-150) avec plus d'aléatoire
+		const greenBase = map(amp, 0, 1, 60, 120);
+		const randomOffset = (Math.random() - 0.5) * 30; // ±15 de variation
+		return Math.max(60, Math.min(120, greenBase + randomOffset));
+	}
+	return (Math.sin(amp * Math.PI * 2) * 180 + 180 + i * 137.5) % 360;
+}
+
 function map(value, inMin, inMax, outMin, outMax) {
   return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 }
